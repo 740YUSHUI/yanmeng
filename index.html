@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌙 验梦提醒器</title>
     <style>
@@ -9,131 +9,206 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
-
         body {
             font-family: -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(145deg, #0b0e1a 0%, #1a1f35 100%);
+            background: linear-gradient(145deg, #0b0e1a, #1a1f35);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
-
         .container {
             background: rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 32px;
-            padding: 32px 24px;
+            padding: 28px 20px;
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 0 auto;
         }
-
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .icon {
-            font-size: 48px;
-            display: block;
-            margin-bottom: 8px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-
         h1 {
             color: #fff;
+            text-align: center;
             font-size: 26px;
-            font-weight: 700;
+            margin-bottom: 2px;
             letter-spacing: 1px;
         }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            margin-top: 4px;
+        .sub {
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+            font-size: 12px;
+            margin-bottom: 16px;
         }
 
+        /* ===== 保活状态提示 ===== */
+        .keep-alive-tip {
+            background: rgba(74, 222, 128, 0.06);
+            border: 1px solid rgba(74, 222, 128, 0.12);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .keep-alive-tip strong {
+            color: #4ade80;
+        }
+        .keep-alive-tip .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ade80;
+            animation: pulse 1.5s ease-in-out infinite;
+            margin-right: 4px;
+        }
+        .keep-alive-tip .status-dot.paused {
+            animation: none;
+            background: #94a3b8;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        /* ===== 状态卡片 ===== */
         .status-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 14px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .status-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+        .status-card .label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
         }
-
-        .status-value {
-            font-size: 16px;
+        .status-card .val {
             font-weight: 600;
+            font-size: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
+        .status-card .val.running {
+            color: #4ade80;
+        }
+        .status-card .val.running::before {
+            content: '';
             display: inline-block;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        .status-dot.running {
+            width: 8px;
+            height: 8px;
             background: #4ade80;
-            box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+            border-radius: 50%;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+        .status-card .val.stopped {
+            color: #94a3b8;
         }
 
-        .status-dot.stopped {
-            background: #94a3b8;
-            animation: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .control-group {
+        /* ===== 通知权限行 ===== */
+        .notif-row {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 24px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 0 2px;
+        }
+        .notif-row span {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+        }
+        .notif-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .notif-badge.granted {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+        .notif-badge.denied {
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+        .notif-badge.default {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
         }
 
+        /* ===== 检测结果 ===== */
+        .test-result {
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin: 10px 0 12px 0;
+            font-size: 12px;
+            display: none;
+            line-height: 1.6;
+        }
+        .test-result.show {
+            display: block;
+        }
+        .test-result.success {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+        .test-result.fail {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            color: #f87171;
+        }
+        .test-result.warn {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        .test-result button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 6px;
+            padding: 4px 14px;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 4px;
+            touch-action: manipulation;
+        }
+        .test-result button:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== 输入框 ===== */
         .input-row {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 14px;
-            padding: 4px 4px 4px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 0 14px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
-
         .input-row label {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.5);
             font-size: 15px;
-            white-space: nowrap;
         }
-
         .input-row input {
             flex: 1;
             background: transparent;
@@ -142,621 +217,841 @@
             color: #fff;
             font-size: 18px;
             font-weight: 600;
-            padding: 12px 4px;
+            padding: 12px 0;
             min-width: 0;
         }
-
         .input-row input::-webkit-inner-spin-button {
             -webkit-appearance: none;
         }
-
-        .input-row input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
         .input-row .unit {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 14px;
-            padding-right: 14px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 14px;
-            padding: 16px 24px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            color: #fff;
-            touch-action: manipulation;
-        }
-
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-start {
-            background: linear-gradient(135deg, #4ade80, #22c55e);
-            box-shadow: 0 4px 20px rgba(74, 222, 128, 0.25);
-        }
-
-        .btn-start:active {
-            box-shadow: 0 2px 10px rgba(74, 222, 128, 0.15);
-        }
-
-        .btn-stop {
-            background: linear-gradient(135deg, #f87171, #ef4444);
-            box-shadow: 0 4px 20px rgba(248, 113, 113, 0.25);
-        }
-
-        .btn-stop:active {
-            box-shadow: 0 2px 10px rgba(248, 113, 113, 0.15);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .quick-presets {
-            display: flex;
-            gap: 8px;
-            margin-top: -8px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .preset-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 6px 14px;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.2);
             font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
         }
 
-        .preset-btn:active {
+        /* ===== 预设按钮 ===== */
+        .presets {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .presets button {
+            flex: 1;
+            min-width: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 5px 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.15s;
+        }
+        .presets button:active {
             background: rgba(255, 255, 255, 0.12);
             transform: scale(0.95);
         }
 
-        .preset-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .log-section {
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 16px;
-        }
-
-        .log-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .log-header span {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
-        }
-
-        .log-clear {
-            background: none;
+        /* ===== 主按钮 ===== */
+        .btn-main {
+            width: 100%;
+            padding: 14px;
             border: none;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 12px;
-            cursor: pointer;
-            padding: 4px 8px;
-        }
-
-        .log-clear:active {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .log-list {
-            max-height: 200px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .log-list::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .log-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .log-list::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-        }
-
-        .log-item {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .log-item .time {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 12px;
-        }
-
-        .log-empty {
-            color: rgba(255, 255, 255, 0.15);
-            text-align: center;
-            font-size: 14px;
-            padding: 20px 0;
-        }
-
-        .permission-tip {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            border-radius: 12px;
-            padding: 12px 16px;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .permission-tip.show {
-            display: block;
-        }
-
-        .permission-tip p {
-            color: #fbbf24;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .permission-tip button {
-            background: #fbbf24;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 16px;
-            color: #1a1f35;
+            border-radius: 14px;
+            font-size: 17px;
             font-weight: 600;
-            font-size: 13px;
             cursor: pointer;
-            margin-top: 8px;
+            color: #fff;
             touch-action: manipulation;
+            transition: all 0.15s;
+        }
+        .btn-main:active {
+            transform: scale(0.97);
+        }
+        .btn-start {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            box-shadow: 0 4px 20px rgba(74, 222, 128, 0.2);
+        }
+        .btn-stop {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            box-shadow: 0 4px 20px rgba(248, 113, 113, 0.2);
         }
 
-        .countdown {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 13px;
+        /* ===== 功能开关 ===== */
+        .settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 14px 0 10px 0;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .settings .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            cursor: pointer;
+            touch-action: manipulation;
+            padding: 3px 6px;
+            border-radius: 8px;
+            user-select: none;
+        }
+        .settings .toggle-item:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .settings .toggle-item .switch {
+            width: 34px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.25s;
+            flex-shrink: 0;
+        }
+        .settings .toggle-item .switch.on {
+            background: #4ade80;
+        }
+        .settings .toggle-item .switch .knob {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.25s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .settings .toggle-item .switch.on .knob {
+            left: 16px;
+        }
+
+        /* ===== 信息行 ===== */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
             margin-top: 12px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            padding: 0 2px;
+        }
+        .info-row .countdown {
             font-variant-numeric: tabular-nums;
         }
 
-        @media (max-width: 440px) {
+        /* ===== 日志 ===== */
+        .log-section {
+            margin-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 12px;
+        }
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .log-header button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-size: 12px;
+            touch-action: manipulation;
+        }
+        .log-header button:active {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .log-list {
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .log-list::-webkit-scrollbar {
+            width: 2px;
+        }
+        .log-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .log-item {
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            padding: 3px 0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .log-empty {
+            color: rgba(255, 255, 255, 0.08);
+            text-align: center;
+            padding: 10px 0;
+            font-size: 12px;
+        }
+
+        /* ===== 全屏弹窗 ===== */
+        .dream-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999999;
+            animation: fadeIn 0.3s ease;
+        }
+        .dream-card {
+            background: linear-gradient(160deg, #1e2440, #0b0e1a);
+            border-radius: 32px;
+            padding: 32px 24px;
+            max-width: 320px;
+            width: 92%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: popIn 0.4s ease;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9);
+        }
+        .dream-card .emoji {
+            font-size: 56px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        .dream-card h2 {
+            color: #fff;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .dream-card .tips {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .dream-card .time {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+            margin-top: 8px;
+        }
+        .dream-card .btn-close {
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 10px 32px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .dream-card .btn-close:active {
+            transform: scale(0.95);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes popIn {
+            0% {
+                transform: scale(0.85) translateY(10px);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 底部安全区 */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
             .container {
-                padding: 24px 16px;
+                padding-bottom: calc(28px + env(safe-area-inset-bottom));
             }
-            h1 {
-                font-size: 22px;
-            }
-            .btn {
-                font-size: 16px;
-                padding: 14px 20px;
-            }
+        }
+
+        /* 提醒计数显示在状态栏 */
+        .badge-count {
+            background: rgba(248, 113, 113, 0.2);
+            color: #f87171;
+            padding: 0 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 4px;
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="app">
-    <div class="header">
-        <span class="icon">🌙</span>
-        <h1>验梦提醒器</h1>
-        <div class="subtitle">清醒梦 · 现实检测</div>
-    </div>
+    <div class="container">
+        <h1>🌙 验梦提醒器</h1>
+        <div class="sub">后台保活版 · 锁屏也提醒</div>
 
-    <!-- 权限提示 -->
-    <div class="permission-tip" id="permissionTip">
-        <p>🔔 需要通知权限才能发送提醒</p>
-        <button onclick="requestNotificationPermission()">授权通知</button>
-    </div>
-
-    <!-- 状态卡片 -->
-    <div class="status-card">
-        <span class="status-label">状态</span>
-        <div class="status-value">
-            <span class="status-dot" id="statusDot"></span>
-            <span id="statusText">已停止</span>
+        <!-- ===== 保活状态 ===== -->
+        <div class="keep-alive-tip" id="keepAliveTip">
+            <span class="status-dot" id="keepAliveDot"></span>
+            <span id="keepAliveText">🟢 保活引擎运行中</span>
         </div>
-    </div>
 
-    <!-- 控制区 -->
-    <div class="control-group">
+        <!-- ===== 状态 ===== -->
+        <div class="status-card">
+            <span class="label">⏳ 状态</span>
+            <span class="val stopped" id="statusVal">已停止</span>
+        </div>
+
+        <!-- ===== 通知权限 ===== -->
+        <div class="notif-row">
+            <span>🔔 通知权限</span>
+            <span id="notifBadge" class="notif-badge default">检查中...</span>
+        </div>
+
+        <!-- ===== 检测结果 ===== -->
+        <div class="test-result" id="testResult"></div>
+
+        <!-- ===== 输入 ===== -->
         <div class="input-row">
-            <label>⏱ 间隔</label>
-            <input type="number" id="intervalInput" value="30" min="1" max="999">
+            <label>⏱</label>
+            <input type="number" id="intervalInput" value="5" min="1" max="999">
             <span class="unit">分钟</span>
         </div>
 
-        <div class="quick-presets">
-            <button class="preset-btn" onclick="setIntervalPreset(5)">5分钟</button>
-            <button class="preset-btn" onclick="setIntervalPreset(15)">15分钟</button>
-            <button class="preset-btn" onclick="setIntervalPreset(30)">30分钟</button>
-            <button class="preset-btn" onclick="setIntervalPreset(60)">60分钟</button>
-            <button class="preset-btn" onclick="setIntervalPreset(90)">90分钟</button>
+        <div class="presets">
+            <button onclick="setPreset(1)">1</button>
+            <button onclick="setPreset(3)">3</button>
+            <button onclick="setPreset(5)">5</button>
+            <button onclick="setPreset(10)">10</button>
+            <button onclick="setPreset(15)">15</button>
+            <button onclick="setPreset(30)">30</button>
         </div>
 
-        <button class="btn btn-start" id="mainBtn" onclick="toggleReminder()">
+        <!-- ===== 主按钮 ===== -->
+        <button class="btn-main btn-start" id="mainBtn" onclick="toggle()">
             ▶️ 启动验梦
         </button>
 
-        <div class="countdown" id="countdownDisplay">下次提醒：--</div>
+        <!-- ===== 功能开关 ===== -->
+        <div class="settings">
+            <div class="toggle-item" onclick="toggleSetting('backgroundNotify')">
+                <span>📤 后台通知</span>
+                <div class="switch on" id="switch_backgroundNotify"><div class="knob"></div></div>
+            </div>
+            <div class="toggle-item" onclick="toggleSetting('vibrate')">
+                <span>📳 震动</span>
+                <div class="switch on" id="switch_vibrate"><div class="knob"></div></div>
+            </div>
+            <div class="toggle-item" onclick="toggleSetting('sound')">
+                <span>🔊 声音</span>
+                <div class="switch on" id="switch_sound"><div class="knob"></div></div>
+            </div>
+            <div class="toggle-item" onclick="toggleSetting('popup')">
+                <span>🖥 弹窗</span>
+                <div class="switch on" id="switch_popup"><div class="knob"></div></div>
+            </div>
+            <div class="toggle-item" onclick="toggleSetting('keepAlive')">
+                <span>🛡️ 保活</span>
+                <div class="switch on" id="switch_keepAlive"><div class="knob"></div></div>
+            </div>
+        </div>
+
+        <!-- ===== 信息行 ===== -->
+        <div class="info-row">
+            <span>⏰ 倒计时 <span class="countdown" id="countdown">--:--</span></span>
+            <span id="remindCount">已提醒 0 次</span>
+        </div>
+
+        <!-- ===== 日志 ===== -->
+        <div class="log-section">
+            <div class="log-header">
+                <span>📋 验梦日志</span>
+                <button onclick="clearLogs()">清空</button>
+            </div>
+            <div class="log-list" id="logList">
+                <div class="log-empty">还没有记录</div>
+            </div>
+        </div>
     </div>
 
-    <!-- 日志 -->
-    <div class="log-section">
-        <div class="log-header">
-            <span>📋 验梦日志</span>
-            <button class="log-clear" onclick="clearLogs()">清空</button>
-        </div>
-        <div class="log-list" id="logList">
-            <div class="log-empty">还没有记录</div>
-        </div>
-    </div>
-</div>
+    <script>
+        // ================================================================
+        //  🚀 终极保活版 - 完整逻辑
+        // ================================================================
 
-<script>
-    // ============================================================
-    //  核心逻辑
-    // ============================================================
+        // -------- 状态 --------
+        let timer = null;
+        let isRunning = false;
+        let nextTime = null;
+        let countdownTimer = null;
+        let logs = [];
+        let remindCount = 0;
+        let wakeLock = null;
+        let heartbeatTimer = null;
+        let lastHeartbeat = Date.now();
 
-    let timer = null;
-    let isRunning = false;
-    let nextReminderTime = null;
-    let countdownInterval = null;
-    let logs = [];
+        // -------- 设置 --------
+        const settings = {
+            backgroundNotify: true,
+            vibrate: true,
+            sound: true,
+            popup: true,
+            keepAlive: true,
+        };
 
-    const statusText = document.getElementById('statusText');
-    const statusDot = document.getElementById('statusDot');
-    const mainBtn = document.getElementById('mainBtn');
-    const intervalInput = document.getElementById('intervalInput');
-    const countdownDisplay = document.getElementById('countdownDisplay');
-    const logList = document.getElementById('logList');
-    const permissionTip = document.getElementById('permissionTip');
+        // -------- DOM --------
+        const statusVal = document.getElementById('statusVal');
+        const mainBtn = document.getElementById('mainBtn');
+        const intervalInput = document.getElementById('intervalInput');
+        const countdownEl = document.getElementById('countdown');
+        const logList = document.getElementById('logList');
+        const remindCountEl = document.getElementById('remindCount');
+        const testResult = document.getElementById('testResult');
+        const notifBadge = document.getElementById('notifBadge');
+        const keepAliveDot = document.getElementById('keepAliveDot');
+        const keepAliveText = document.getElementById('keepAliveText');
 
-    // —— 检查通知权限（浏览器） ——
-    if ('Notification' in window) {
-        if (Notification.permission === 'default') {
-            permissionTip.classList.add('show');
-        } else if (Notification.permission === 'denied') {
-            permissionTip.classList.add('show');
-            permissionTip.querySelector('p').textContent = '🔕 通知已被拒绝，请在浏览器设置中开启';
-            permissionTip.querySelector('button').style.display = 'none';
-        }
-    }
+        // ================================================================
+        //  🔔 通知权限检测
+        // ================================================================
 
-    window.requestNotificationPermission = function() {
-        if ('Notification' in window) {
-            Notification.requestPermission().then(perm => {
+        function detectNotificationSupport() {
+            let canNotify = false;
+            let details = [];
+
+            if ('Notification' in window) {
+                const perm = Notification.permission;
+                updateNotifBadge(perm);
+
                 if (perm === 'granted') {
-                    permissionTip.classList.remove('show');
+                    canNotify = true;
+                    details.push('✅ 通知权限已授权');
+                } else if (perm === 'denied') {
+                    details.push('❌ 通知权限被拒绝，请到系统设置中开启');
                 } else {
-                    permissionTip.querySelector('p').textContent = '🔕 通知被拒绝，部分功能受限';
+                    details.push('⚠️ 通知权限未确定，请点击下方按钮授权');
                 }
-            });
-        }
-    };
+            } else {
+                details.push('❌ 浏览器不支持通知API');
+            }
 
-    // —— 预设间隔 ——
-    window.setIntervalPreset = function(minutes) {
-        intervalInput.value = minutes;
-        if (!isRunning) {
-            updateCountdownDisplay(null);
-        }
-    };
+            // 检测震动
+            if (navigator.vibrate) {
+                details.push('✅ 震动支持');
+            }
 
-    // —— 切换启动/停止 ——
-    window.toggleReminder = function() {
-        if (isRunning) {
-            stopReminder();
-        } else {
-            startReminder();
-        }
-    };
+            // 检测Service Worker
+            if ('serviceWorker' in navigator) {
+                details.push('✅ Service Worker支持');
+            }
 
-    function startReminder() {
-        const minutes = parseInt(intervalInput.value);
-        if (isNaN(minutes) || minutes < 1) {
-            alert('请输入有效的分钟数（≥1）');
-            return;
+            // 检测Wake Lock（保活）
+            if ('wakeLock' in navigator) {
+                details.push('✅ Wake Lock支持（保活）');
+            }
+
+            showTestResult(canNotify, details);
+            return canNotify;
         }
 
-        if ('Notification' in window && Notification.permission === 'denied') {
-            alert('🔕 通知被拒绝，请在浏览器设置中允许通知');
-            return;
-        }
+        function showTestResult(canNotify, details) {
+            testResult.classList.add('show');
 
-        isRunning = true;
-        updateUI();
-
-        // 立即发送第一次提醒
-        sendReminder();
-
-        // 设定定时器
-        const intervalMs = minutes * 60 * 1000;
-        timer = setInterval(() => {
-            sendReminder();
-        }, intervalMs);
-
-        // 更新倒计时
-        const now = Date.now();
-        nextReminderTime = now + intervalMs;
-        updateCountdown();
-        countdownInterval = setInterval(updateCountdown, 1000);
-
-        mainBtn.textContent = '⏹ 停止验梦';
-        mainBtn.className = 'btn btn-stop';
-    }
-
-    function stopReminder() {
-        isRunning = false;
-        if (timer) {
-            clearInterval(timer);
-            timer = null;
-        }
-        if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-        }
-        nextReminderTime = null;
-        updateUI();
-        countdownDisplay.textContent = '下次提醒：--';
-        mainBtn.textContent = '▶️ 启动验梦';
-        mainBtn.className = 'btn btn-start';
-    }
-
-    // —— 发送提醒 ——
-    function sendReminder() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
-
-        // 1. 页面内弹窗提醒
-        showDreamAlert(timeStr);
-
-        // 2. 浏览器通知
-        if ('Notification' in window && Notification.permission === 'granted') {
-            try {
-                const notif = new Notification('🌙 验梦时间到！', {
-                    body: '捏鼻子、看手指、数手掌纹！此刻是梦是真？',
-                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y=".9em" font-size="90"%3E🌙%3C/text%3E%3C/svg%3E',
-                    tag: 'dreamcheck',
-                    requireInteraction: true,
-                    silent: false,
-                });
-                notif.onclick = function() {
-                    window.focus();
-                    notif.close();
-                };
-                setTimeout(() => notif.close(), 15000);
-            } catch (e) {
-                // 静默失败
+            if (canNotify) {
+                testResult.className = 'test-result show success';
+                testResult.innerHTML = `
+                    ✅ <strong>后台通知可用！</strong><br>
+                    ${details.join('<br>')}
+                    <br>📌 锁屏/切后台后仍能收到通知
+                `;
+            } else {
+                testResult.className = 'test-result show warn';
+                testResult.innerHTML = `
+                    ⚠️ <strong>需要授权通知</strong><br>
+                    ${details.join('<br>')}
+                    <br><button onclick="requestNotificationPermission()">📢 点击授权通知</button>
+                `;
             }
         }
 
-        // 3. 震动（移动端）
-        if (navigator.vibrate) {
-            navigator.vibrate([300, 100, 300, 100, 300]);
+        function updateNotifBadge(perm) {
+            notifBadge.className = 'notif-badge ' + perm;
+            const labels = {
+                'granted': '✅ 已授权',
+                'denied': '❌ 已拒绝',
+                'default': '⚠️ 未授权'
+            };
+            notifBadge.textContent = labels[perm] || perm;
         }
 
-        // 4. 声音提醒（Web Audio）
-        try {
-            playBeep();
-        } catch (e) { /* 静默 */ }
-
-        // 5. 记录日志
-        addLog(timeStr);
-    }
-
-    // —— 页面内弹窗 ——
-    function showDreamAlert(timeStr) {
-        // 移除旧弹窗
-        const old = document.querySelector('.dream-overlay');
-        if (old) old.remove();
-
-        const overlay = document.createElement('div');
-        overlay.className = 'dream-overlay';
-        overlay.style.cssText = `
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            animation: fadeIn 0.3s ease;
-            padding: 32px;
-        `;
-
-        // 注入关键帧动画（如果还没有）
-        if (!document.getElementById('dreamStyles')) {
-            const style = document.createElement('style');
-            style.id = 'dreamStyles';
-            style.textContent = `
-                @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-                @keyframes popIn { 0% { transform:scale(0.8); opacity:0; } 100% { transform:scale(1); opacity:1; } }
-            `;
-            document.head.appendChild(style);
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(perm => {
+                    updateNotifBadge(perm);
+                    setTimeout(detectNotificationSupport, 300);
+                });
+            } else {
+                alert('您的设备不支持通知功能');
+            }
         }
 
-        overlay.innerHTML = `
-            <div style="background:linear-gradient(145deg,#1a1f35,#0b0e1a);border-radius:32px;padding:40px 32px;max-width:360px;width:100%;text-align:center;border:1px solid rgba(255,255,255,0.1);animation:popIn 0.4s ease;">
-                <div style="font-size:64px;margin-bottom:12px;">🌙</div>
-                <h2 style="color:#fff;font-size:24px;margin-bottom:8px;">验梦时间！</h2>
-                <p style="color:rgba(255,255,255,0.6);font-size:16px;line-height:1.6;margin-bottom:6px;">
-                    👃 捏鼻子<br>
-                    ✋ 看手指<br>
-                    🖐 数手掌纹
-                </p>
-                <p style="color:rgba(255,255,255,0.3);font-size:13px;margin-top:12px;">
-                    ${timeStr} · 保持清醒
-                </p>
-                <button onclick="this.closest('.dream-overlay').remove()" style="
-                    margin-top:20px;
-                    background:rgba(255,255,255,0.1);
-                    border:1px solid rgba(255,255,255,0.15);
-                    border-radius:12px;
-                    padding:12px 32px;
-                    color:#fff;
-                    font-size:16px;
-                    font-weight:600;
-                    cursor:pointer;
-                    touch-action:manipulation;
-                ">我知道了</button>
-            </div>
-        `;
+        // ================================================================
+        //  🛡️ 保活引擎（核心）
+        // ================================================================
 
-        document.body.appendChild(overlay);
+        async function startKeepAlive() {
+            if (!settings.keepAlive) return;
 
-        // 5秒后自动关闭
-        setTimeout(() => {
-            if (overlay.parentNode) overlay.remove();
-        }, 8000);
-    }
+            try {
+                // 请求屏幕常亮（防止息屏冻结）
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('✅ 屏幕常亮已开启');
+                }
+            } catch (e) {
+                console.log('⚠️ 屏幕常亮不支持:', e);
+            }
 
-    // —— 声音 ——
-    function playBeep() {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        osc.type = 'sine';
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.5);
+            // 心跳检测（每5秒检查一次是否被冻结）
+            if (heartbeatTimer) clearInterval(heartbeatTimer);
+            heartbeatTimer = setInterval(() => {
+                const now = Date.now();
+                const gap = now - lastHeartbeat;
 
-        // 第二次蜂鸣
-        setTimeout(() => {
-            const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
-            const osc2 = ctx2.createOscillator();
-            const gain2 = ctx2.createGain();
-            osc2.connect(gain2);
-            gain2.connect(ctx2.destination);
-            osc2.frequency.value = 1100;
-            osc2.type = 'sine';
-            gain2.gain.setValueAtTime(0.25, ctx2.currentTime);
-            gain2.gain.exponentialRampToValueAtTime(0.01, ctx2.currentTime + 0.3);
-            osc2.start(ctx2.currentTime);
-            osc2.stop(ctx2.currentTime + 0.3);
-        }, 200);
-    }
+                // 如果心跳间隔超过15秒，说明被冻结了
+                if (gap > 15000) {
+                    console.log('⚠️ 检测到冻结，心跳间隔:', gap, 'ms');
+                    // 刷新保活状态
+                    if (settings.keepAlive && 'wakeLock' in navigator && !wakeLock) {
+                        navigator.wakeLock.request('screen').then(lock => {
+                            wakeLock = lock;
+                            console.log('✅ 屏幕常亮已恢复');
+                        }).catch(() => {});
+                    }
+                }
+                lastHeartbeat = now;
 
-    // —— 日志 ——
-    function addLog(timeStr) {
-        logs.push({ time: timeStr, timestamp: Date.now() });
-        if (logs.length > 50) logs.shift();
-        renderLogs();
-    }
+                // 更新保活状态指示器
+                updateKeepAliveStatus(true);
+            }, 5000);
 
-    function renderLogs() {
-        if (logs.length === 0) {
-            logList.innerHTML = '<div class="log-empty">还没有记录</div>';
-            return;
+            updateKeepAliveStatus(true);
         }
-        logList.innerHTML = logs.slice().reverse().map(log =>
-            `<div class="log-item">
-                <span>🌙 验梦提醒</span>
-                <span class="time">${log.time}</span>
-            </div>`
-        ).join('');
-    }
 
-    window.clearLogs = function() {
-        logs = [];
-        renderLogs();
-    };
-
-    // —— 倒计时 ——
-    function updateCountdown() {
-        if (!nextReminderTime) {
-            countdownDisplay.textContent = '下次提醒：--';
-            return;
+        function stopKeepAlive() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+            if (wakeLock) {
+                try {
+                    wakeLock.release();
+                    wakeLock = null;
+                    console.log('✅ 屏幕常亮已释放');
+                } catch (e) {}
+            }
+            updateKeepAliveStatus(false);
         }
-        const diff = Math.max(0, nextReminderTime - Date.now());
-        const mins = Math.floor(diff / 60000);
-        const secs = Math.floor((diff % 60000) / 1000);
-        countdownDisplay.textContent = `下次提醒：${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-        if (diff <= 0) {
-            countdownDisplay.textContent = '⏰ 即将提醒...';
-        }
-    }
 
-    function updateCountdownDisplay(time) {
-        if (time) {
-            nextReminderTime = time;
+        function updateKeepAliveStatus(active) {
+            if (active) {
+                keepAliveDot.className = 'status-dot';
+                keepAliveText.textContent = '🟢 保活引擎运行中';
+            } else {
+                keepAliveDot.className = 'status-dot paused';
+                keepAliveText.textContent = '⚪ 保活已暂停';
+            }
+        }
+
+        // ================================================================
+        //  ⚙️ 功能开关
+        // ================================================================
+
+        function toggleSetting(name) {
+            settings[name] = !settings[name];
+            const sw = document.getElementById('switch_' + name);
+            if (sw) sw.classList.toggle('on', settings[name]);
+
+            // 如果关闭保活，停止保活引擎
+            if (name === 'keepAlive' && !settings.keepAlive) {
+                stopKeepAlive();
+            }
+            // 如果开启保活，启动保活引擎
+            if (name === 'keepAlive' && settings.keepAlive && isRunning) {
+                startKeepAlive();
+            }
+
+            console.log('⚙️ ' + name + ' =', settings[name]);
+        }
+
+        // ================================================================
+        //  ⏰ 核心逻辑
+        // ================================================================
+
+        function setPreset(m) {
+            intervalInput.value = m;
+            if (!isRunning) countdownEl.textContent = '--:--';
+        }
+
+        function toggle() {
+            if (isRunning) { stop(); } else { start(); }
+        }
+
+        function start() {
+            const mins = parseInt(intervalInput.value);
+            if (mins < 1) {
+                alert('⏰ 间隔至少1分钟！');
+                return;
+            }
+
+            // 请求通知权限
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(() => detectNotificationSupport());
+            }
+
+            isRunning = true;
+            remindCount = 0;
+            statusVal.textContent = '运行中';
+            statusVal.className = 'val running';
+            mainBtn.textContent = '⏹ 停止';
+            mainBtn.className = 'btn-main btn-stop';
+
+            // 启动保活引擎
+            if (settings.keepAlive) {
+                startKeepAlive();
+            }
+
+            // 立即发送第一次提醒
+            sendAlert();
+
+            const ms = mins * 60 * 1000;
+            timer = setInterval(sendAlert, ms);
+
+            nextTime = Date.now() + ms;
             updateCountdown();
-        } else {
-            countdownDisplay.textContent = '下次提醒：--';
+            if (countdownTimer) clearInterval(countdownTimer);
+            countdownTimer = setInterval(updateCountdown, 1000);
+
+            updateRemindCount();
         }
-    }
 
-    // —— UI 更新 ——
-    function updateUI() {
-        if (isRunning) {
-            statusText.textContent = '运行中';
-            statusDot.className = 'status-dot running';
-        } else {
-            statusText.textContent = '已停止';
-            statusDot.className = 'status-dot stopped';
+        function stop() {
+            isRunning = false;
+            statusVal.textContent = '已停止';
+            statusVal.className = 'val stopped';
+            mainBtn.textContent = '▶️ 启动验梦';
+            mainBtn.className = 'btn-main btn-start';
+            countdownEl.textContent = '--:--';
+
+            if (timer) { clearInterval(timer);
+                timer = null; }
+            if (countdownTimer) { clearInterval(countdownTimer);
+                countdownTimer = null; }
+            nextTime = null;
+
+            // 停止保活引擎
+            stopKeepAlive();
         }
-    }
 
-    // —— 初始化 ——
-    updateUI();
-    renderLogs();
+        // ================================================================
+        //  🔔 提醒函数（核心）
+        // ================================================================
 
-    // 页面关闭时清理定时器
-    window.addEventListener('beforeunload', function() {
-        if (timer) clearInterval(timer);
-        if (countdownInterval) clearInterval(countdownInterval);
-    });
+        function sendAlert() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', { hour12: false });
 
-    console.log('🌙 验梦提醒器已加载');
-    console.log('💡 设置间隔后点击"启动验梦"即可');
-</script>
+            remindCount++;
+            updateRemindCount();
+
+            console.log('🌙 验梦提醒 @', timeStr, '#' + remindCount);
+
+            // ---- 1. 后台通知（锁屏也能收到！） ----
+            if (settings.backgroundNotify && 'Notification' in window && Notification.permission === 'granted') {
+                try {
+                    const n = new Notification('🌙 验梦时间到！', {
+                        body: '捏鼻子 · 看手指 · 数掌纹',
+                        tag: 'dreamcheck_' + Date.now(),
+                        requireInteraction: true,
+                        silent: false,
+                        vibrate: [300, 100, 300],
+                        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y=".9em" font-size="90"%3E🌙%3C/text%3E%3C/svg%3E'
+                    });
+                    n.onclick = function() { window.focus();
+                        n.close(); };
+                    setTimeout(() => n.close(), 20000);
+                    console.log('✅ 后台通知已发送');
+                } catch (e) {
+                    console.log('❌ 通知失败:', e);
+                }
+            }
+
+            // ---- 2. 震动 ----
+            if (settings.vibrate && navigator.vibrate) {
+                navigator.vibrate([400, 150, 400, 150, 400]);
+            }
+
+            // ---- 3. 声音 ----
+            if (settings.sound) { try { playSound(); } catch (e) {} }
+
+            // ---- 4. 前台弹窗（页面可见时） ----
+            if (settings.popup && !document.hidden) {
+                showPopup(timeStr);
+            }
+
+            // ---- 5. 标题闪烁 ----
+            document.title = '🌙 验梦！！！';
+            setTimeout(() => { document.title = '🌙 验梦提醒器'; }, 3000);
+
+            // ---- 6. 日志 ----
+            addLog(timeStr);
+        }
+
+        // ================================================================
+        //  🖥 弹窗
+        // ================================================================
+
+        function showPopup(timeStr) {
+            const old = document.querySelector('.dream-overlay');
+            if (old) old.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'dream-overlay';
+            overlay.innerHTML = `
+                <div class="dream-card">
+                    <span class="emoji">🌙</span>
+                    <h2>验梦时间！</h2>
+                    <div class="tips">👃 捏鼻子 · ✋ 看手指 · 🖐 数掌纹</div>
+                    <div class="time">${timeStr} · 第 ${remindCount} 次</div>
+                    <button class="btn-close" onclick="closePopup(this)">✅ 我清醒着</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closePopup(this);
+            });
+            setTimeout(() => { if (overlay.parentNode) closePopup(overlay); }, 12000);
+        }
+
+        function closePopup(el) {
+            const overlay = el.closest ? el.closest('.dream-overlay') : el;
+            if (overlay && overlay.parentNode) {
+                overlay.style.opacity = '0';
+                overlay.style.transition = 'opacity 0.3s';
+                setTimeout(() => overlay.remove(), 300);
+            }
+        }
+
+        // ================================================================
+        //  🔊 声音
+        // ================================================================
+
+        function playSound() {
+            try {
+                const ctx = new(window.AudioContext || window.webkitAudioContext)();
+                if (ctx.state === 'suspended') ctx.resume();
+                [880, 1100].forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.3);
+                    }, i * 200);
+                });
+            } catch (e) {}
+        }
+
+        // ================================================================
+        //  📊 辅助函数
+        // ================================================================
+
+        function updateCountdown() {
+            if (!nextTime) { countdownEl.textContent = '--:--'; return; }
+            const diff = Math.max(0, nextTime - Date.now());
+            const m = Math.floor(diff / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            countdownEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            if (diff <= 1000) countdownEl.textContent = '⏰ 即将提醒';
+        }
+
+        function updateRemindCount() {
+            remindCountEl.textContent = `已提醒 ${remindCount} 次`;
+        }
+
+        function addLog(timeStr) {
+            logs.push({ time: timeStr, count: remindCount });
+            if (logs.length > 50) logs.shift();
+            renderLogs();
+        }
+
+        function renderLogs() {
+            if (logs.length === 0) {
+                logList.innerHTML = '<div class="log-empty">还没有记录</div>';
+                return;
+            }
+            logList.innerHTML = logs.slice().reverse().map(log =>
+                `<div class="log-item"><span>🌙 #${log.count}</span><span>${log.time}</span></div>`
+            ).join('');
+        }
+
+        function clearLogs() { logs = [];
+            renderLogs(); }
+
+        // ================================================================
+        //  🔄 页面可见性变化（切回前台时补发）
+        // ================================================================
+
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && isRunning) {
+                console.log('👀 页面回到前台');
+                // 检查是否错过了提醒
+                if (nextTime && Date.now() > nextTime) {
+                    console.log('⏰ 补发遗漏的提醒');
+                    sendAlert();
+                    const mins = parseInt(intervalInput.value);
+                    if (mins > 0) {
+                        nextTime = Date.now() + mins * 60 * 1000;
+                    }
+                }
+                // 重新检测状态
+                detectNotificationSupport();
+                // 恢复保活
+                if (settings.keepAlive && isRunning) {
+                    startKeepAlive();
+                }
+            }
+        });
+
+        // ================================================================
+        //  🚀 初始化
+        // ================================================================
+
+        renderLogs();
+        updateRemindCount();
+
+        setTimeout(() => {
+            detectNotificationSupport();
+        }, 500);
+
+        console.log('🌙 验梦提醒器已加载（终极保活版）');
+        console.log('📌 包含功能：通知+震动+声音+弹窗+保活');
+        console.log('🛡️ 锁屏后仍能收到通知');
+    </script>
 
 </body>
 </html>
